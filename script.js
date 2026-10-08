@@ -1,6 +1,6 @@
 const modules=[
 {id:'01',name:'COMMS',description:'Communications',icon:'◉',url:'tel:'},
-{id:'02',name:'WEB',description:'Browser / Network',icon:'◎',url:'https://www.mozilla.org/'},
+{id:'02',name:'WEB',description:'Browser / Network',icon:'◎',url:'https://www.google.com/'},
 {id:'03',name:'FILES',description:'Local storage',icon:'▤',url:null},
 {id:'04',name:'CAMERA',description:'Imaging system',icon:'▣',url:null},
 {id:'05',name:'MAIL',description:'Email client',icon:'✉',url:'mailto:'},
@@ -13,7 +13,7 @@ let favorites=loadFavorites();
 function loadFavorites(){try{const data=JSON.parse(localStorage.getItem('deck-favorites'));if(Array.isArray(data)&&data.length===4&&data.every(id=>modules.some(m=>m.id===id)))return data}catch{}return ['01','02','03','04']}
 function output(text){$('console-output').textContent='> '+text}
 function renderQuick(){ $('quick-grid').replaceChildren(...favorites.map(id=>{const m=modules.find(x=>x.id===id);const b=document.createElement('button');b.className='module';b.innerHTML='<div class="module-top"><span class="module-icon"></span><span class="module-id"></span></div><div><strong></strong><small></small></div>';b.querySelector('.module-icon').textContent=m.icon;b.querySelector('.module-id').textContent=m.id;b.querySelector('strong').textContent=m.name;b.querySelector('small').textContent=m.description;b.addEventListener('click',()=>launch(m));return b}))}
-function launch(m){if(m.name==='SETTINGS'){configure();return}if(m.name==='STATUS'){output(statusText());return}if(!m.url){output(m.name+' / NATIVE ANDROID INTEGRATION PENDING');return}output('OPENING '+m.name);window.location.href=m.url}
+function launch(m){if(m.name==='SETTINGS'){configure();return}if(m.name==='STATUS'){output(statusText());return}if(m.name==='WEB'){output('OPENING BROWSER / WEB DESTINATION');window.open('https://www.google.com/','_blank','noopener,noreferrer');return}if(!m.url){output(m.name+' / NATIVE ANDROID INTEGRATION PENDING');return}output('OPENING '+m.name);window.location.href=m.url}
 function statusText(){return 'LINK '+(navigator.onLine?'ONLINE':'OFFLINE')+' / PLATFORM WEB PROTOTYPE'}
 function registry(filter=''){const list=$('module-list');list.replaceChildren();const found=modules.filter(m=>(m.name+' '+m.description).toLowerCase().includes(filter.toLowerCase()));for(const m of found){const b=document.createElement('button');b.className='registry-item';const icon=document.createElement('span');icon.textContent=m.icon;const body=document.createElement('div');const title=document.createElement('strong');title.textContent=m.id+' / '+m.name;const desc=document.createElement('small');desc.textContent=m.description;body.append(title,desc);b.append(icon,body);b.addEventListener('click',()=>{closeRegistry();launch(m)});list.append(b)}if(!found.length)list.textContent='NO MATCHING MODULES'}
 function openRegistry(){registry();$('overlay').hidden=false;$('module-filter').value='';$('module-filter').focus()}
