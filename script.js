@@ -1,0 +1,32 @@
+const modules=[
+{id:'01',name:'COMMS',description:'Communications',icon:'◉',url:'tel:'},
+{id:'02',name:'WEB',description:'Browser / Network',icon:'◎',url:'https://www.mozilla.org/'},
+{id:'03',name:'FILES',description:'Local storage',icon:'▤',url:null},
+{id:'04',name:'CAMERA',description:'Imaging system',icon:'▣',url:null},
+{id:'05',name:'MAIL',description:'Email client',icon:'✉',url:'mailto:'},
+{id:'06',name:'MAPS',description:'Navigation',icon:'⌖',url:'https://www.openstreetmap.org/'},
+{id:'07',name:'SETTINGS',description:'Deck configuration',icon:'⚙',url:null},
+{id:'08',name:'STATUS',description:'System diagnostics',icon:'≋',url:null}
+];
+const $=id=>document.getElementById(id);
+let favorites=loadFavorites();
+function loadFavorites(){try{const data=JSON.parse(localStorage.getItem('deck-favorites'));if(Array.isArray(data)&&data.length===4&&data.every(id=>modules.some(m=>m.id===id)))return data}catch{}return ['01','02','03','04']}
+function output(text){$('console-output').textContent='> '+text}
+function renderQuick(){ $('quick-grid').replaceChildren(...favorites.map(id=>{const m=modules.find(x=>x.id===id);const b=document.createElement('button');b.className='module';b.innerHTML='<div class="module-top"><span class="module-icon"></span><span class="module-id"></span></div><div><strong></strong><small></small></div>';b.querySelector('.module-icon').textContent=m.icon;b.querySelector('.module-id').textContent=m.id;b.querySelector('strong').textContent=m.name;b.querySelector('small').textContent=m.description;b.addEventListener('click',()=>launch(m));return b}))}
+function launch(m){if(m.name==='SETTINGS'){configure();return}if(m.name==='STATUS'){output(statusText());return}if(!m.url){output(m.name+' / NATIVE ANDROID INTEGRATION PENDING');return}output('OPENING '+m.name);window.location.href=m.url}
+function statusText(){return 'LINK '+(navigator.onLine?'ONLINE':'OFFLINE')+' / PLATFORM WEB PROTOTYPE'}
+function registry(filter=''){const list=$('module-list');list.replaceChildren();const found=modules.filter(m=>(m.name+' '+m.description).toLowerCase().includes(filter.toLowerCase()));for(const m of found){const b=document.createElement('button');b.className='registry-item';const icon=document.createElement('span');icon.textContent=m.icon;const body=document.createElement('div');const title=document.createElement('strong');title.textContent=m.id+' / '+m.name;const desc=document.createElement('small');desc.textContent=m.description;body.append(title,desc);b.append(icon,body);b.addEventListener('click',()=>{closeRegistry();launch(m)});list.append(b)}if(!found.length)list.textContent='NO MATCHING MODULES'}
+function openRegistry(){registry();$('overlay').hidden=false;$('module-filter').value='';$('module-filter').focus()}
+function closeRegistry(){$('overlay').hidden=true;$('registry-toggle').focus()}
+$('registry-toggle').addEventListener('click',openRegistry);$('close-registry').addEventListener('click',closeRegistry);$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeRegistry()});$('module-filter').addEventListener('input',e=>registry(e.target.value));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('overlay').hidden)closeRegistry()});
+function configure(){const names=modules.map(m=>m.id+':'+m.name).join(' · ');const input=prompt('Choose four module IDs, separated by commas.\n'+names,favorites.join(','));if(input===null)return;const ids=input.split(',').map(x=>x.trim().padStart(2,'0'));if(ids.length!==4||new Set(ids).size!==4||ids.some(id=>!modules.some(m=>m.id===id))){output('CONFIG ERROR / CHOOSE FOUR UNIQUE VALID IDS');return}favorites=ids;localStorage.setItem('deck-favorites',JSON.stringify(ids));renderQuick();output('QUICK ACCESS CONFIGURATION SAVED')}
+$('edit').addEventListener('click',configure);$('help').addEventListener('click',()=>output('HELP / STATUS / MODULES / CONFIG / CLEAR / OPEN [NAME]'));
+function execute(raw){const c=raw.trim().toLowerCase();if(!c)return;if(c==='help')output('HELP / STATUS / MODULES / CONFIG / CLEAR / OPEN [NAME]');else if(c==='status')output(statusText());else if(c==='modules')openRegistry();else if(c==='config')configure();else if(c==='clear')output('READY FOR INPUT');else{const term=c.startsWith('open ')?c.slice(5):c;const matches=modules.filter(m=>m.name.toLowerCase()===term);if(matches.length===1)launch(matches[0]);else output('UNKNOWN COMMAND / TRY HELP OR A MODULE NAME')}}
+$('command-form').addEventListener('submit',e=>{e.preventDefault();execute($('command').value);$('command').value='';$('suggestions').hidden=true});
+$('command').addEventListener('input',e=>{const term=e.target.value.trim().toLowerCase().replace(/^open /,'');const box=$('suggestions');box.replaceChildren();if(!term){box.hidden=true;return}const found=modules.filter(m=>m.name.toLowerCase().includes(term)).slice(0,4);box.hidden=!found.length;for(const m of found){const b=document.createElement('button');b.type='button';b.textContent=m.name+' / '+m.description;b.addEventListener('click',()=>{launch(m);$('command').value='';box.hidden=true});box.append(b)}});
+function tick(){const now=new Date();$('clock').textContent=new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit',hour12:false}).format(now);$('date').textContent=new Intl.DateTimeFormat(undefined,{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).format(now).toUpperCase()}
+function connectivity(){$('network').textContent=navigator.onLine?'ONLINE':'OFFLINE';$('network-note').textContent='BROWSER SIGNAL'}
+window.addEventListener('online',connectivity);window.addEventListener('offline',connectivity);
+if('getBattery' in navigator){navigator.getBattery().then(b=>{function update(){$('battery').textContent=Math.round(b.level*100)+'%';$('battery-note').textContent=b.charging?'CHARGING':'DISCHARGING'}update();b.addEventListener('levelchange',update);b.addEventListener('chargingchange',update)}).catch(()=>{})}
+let touchY=0;document.addEventListener('touchstart',e=>{if(e.target.closest('input,button,.overlay'))return;touchY=e.touches[0].clientY},{passive:true});document.addEventListener('touchend',e=>{if(e.target.closest('input,button,.overlay'))return;if(touchY-e.changedTouches[0].clientY>90&&$('overlay').hidden)openRegistry()},{passive:true});
+renderQuick();tick();connectivity();setInterval(tick,15000);
