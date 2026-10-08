@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1114"><meta name="description" content="Industrial cyberdeck launcher interface prototype">
+<title>DECK/OS — Industrial Console</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="deck">
+<header class="mast"><div class="brand"><span class="rail"></span><div><strong>DECK<span>/</span>OS</strong><small>FIELD TERMINAL · REV 0.1</small></div></div><div class="indicator"><i></i> INTERFACE ACTIVE</div></header>
+<main>
+<section class="panel clock-panel" aria-label="Clock">
+<div><div class="eyebrow">LOCAL CLOCK <span class="index">SYS/001</span></div><time id="clock">--:--</time><div class="date" id="date">INITIALISING</div></div>
+<div class="clock-side"><div class="micro">OPERATING MODE</div><strong>LOCAL</strong><span>CONTROL NODE</span></div>
+</section>
+<div class="section-head"><span>01 / QUICK ACCESS</span><button id="edit" class="text-btn">CONFIGURE ↗</button></div>
+<section class="quick-grid" id="quick-grid" aria-label="Quick access modules"></section>
+<div class="section-head"><span>02 / SYSTEM TELEMETRY</span><span class="muted">COMPACT</span></div>
+<section class="telemetry" aria-label="System telemetry">
+<div><small>BATTERY</small><strong id="battery">N/A</strong><em id="battery-note">WEB RESTRICTED</em></div>
+<div><small>LINK</small><strong id="network">CHECKING</strong><em id="network-note">BROWSER SIGNAL</em></div>
+<div><small>PLATFORM</small><strong>WEB</strong><em>PROTOTYPE</em></div>
+</section>
+<div class="section-head"><span>03 / COMMAND ENTRY</span><button id="help" class="text-btn">HELP ?</button></div>
+<form id="command-form" class="command-form"><label for="command">&gt;</label><input id="command" type="text" autocomplete="off" spellcheck="false" placeholder="Search modules or enter command" aria-label="Command or app search"><button type="submit" aria-label="Execute command">↵</button></form>
+<div id="suggestions" class="suggestions" hidden></div>
+<div id="console-output" class="console-output" role="status" aria-live="polite">&gt; READY FOR INPUT</div>
+</main>
+<footer><button id="registry-toggle" class="registry-toggle"><span>▦ &nbsp; MODULE REGISTRY</span><span>OPEN ↑</span></button><div class="footline"><span>DECK/OS · WEB CONCEPT</span><span>LOCAL / 001</span></div></footer>
+</div>
+<div id="overlay" class="overlay" hidden><section class="registry" role="dialog" aria-modal="true" aria-labelledby="registry-title"><div class="registry-head"><div><small>04 / INSTALLED MODULES</small><h2 id="registry-title">MODULE REGISTRY</h2></div><button id="close-registry" aria-label="Close module registry">✕</button></div><input id="module-filter" placeholder="Filter modules..." aria-label="Filter modules"><div id="module-list"></div><p class="registry-note">Prototype modules use web-safe destinations. Native Android app discovery comes later.</p></section></div>
+<script src="./script.js"></script>
+</body></html>
